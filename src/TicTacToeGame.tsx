@@ -1,5 +1,6 @@
 import React from "react";
-import { debounce } from "lodash";
+import _debounce from "lodash/debounce";
+import _isEmpty from "lodash/isEmpty";
 
 import { addStep } from "actions/ticTacToeGame";
 import { connect } from "react-redux";
@@ -10,6 +11,8 @@ const rootCls = "ticTacToeGame";
 
 const cellWidth = 100;
 
+const roundedNumber = (number: number) => Math.round(number);
+
 interface State {
   pageXOffset: number;
   pageYOffset: number;
@@ -17,6 +20,9 @@ interface State {
 
 interface MapState {
   symbols?: any[];
+  selectedPositionX: number;
+  selectedPositionY: number;
+  isOdd: boolean;
 }
 
 interface Props {
@@ -34,18 +40,16 @@ const mapStateToProps = (state: MapState) => state;
 class TicTacToeGame extends React.Component<any, any> {
   state: Readonly<State> = {
     pageXOffset: 0,
-    pageYOffset: 0,
+    pageYOffset: 0
   };
 
   componentDidMount() {
-    const { addStep } = this.props;
+    window.addEventListener("scroll", _debounce(this.handleScroll, 200));
 
-    window.addEventListener("scroll", debounce(this.handleScroll, 200));
+    const cellsXQuantity = roundedNumber(window.innerWidth / cellWidth) + 1;
+    const cellsYQuantity = roundedNumber(window.innerHeight / cellWidth) + 1;
 
-    const cellsXQuantity = window.innerWidth / cellWidth;
-    const cellsYQuantity = window.innerHeight / cellWidth;
-
-    addStep({ cellsXQuantity, cellsYQuantity });
+    this.addStep({ cellsXQuantity, cellsYQuantity });
   }
 
   componentWillUnmount() {
@@ -53,58 +57,90 @@ class TicTacToeGame extends React.Component<any, any> {
   }
 
   handleScroll = () => {
-    const {
-      pageXOffset
-    } = this.state;
+    const { pageXOffset } = this.state;
 
-    const { cellsXQuantity, cellsYQuantity, addStep } = this.props;
+    const { cellsXQuantity, cellsYQuantity } = this.props;
 
     if (window.pageXOffset > pageXOffset) {
       this.setState((prevState: any) => ({
         pageXOffset: window.pageXOffset
       }));
 
-      addStep({ cellsXQuantity: cellsXQuantity + 1 });
+      this.addStep({ cellsXQuantity: cellsXQuantity + 1, cellsYQuantity });
     } else {
       this.setState((prevState: any) => ({
-        pageYOffset: window.pageYOffset,
+        pageYOffset: window.pageYOffset
       }));
 
-      addStep({ cellsYQuantity: cellsYQuantity + 1 });
+      this.addStep({ cellsYQuantity: cellsYQuantity + 1, cellsXQuantity });
     }
   };
 
+  changeSymbol = (isOdd: boolean, currentSymbol: any) => {
+    if (currentSymbol === "") {
+      this.addStep({ isOdd: !isOdd });
+
+      return isOdd ? "X" : "O";
+    }
+
+    return currentSymbol;
+  };
+
+  addStep = (coordinates: any) => {
+    const { addStep } = this.props;
+    addStep(coordinates);
+  };
+
+  handleClick = (selectedPositionX: any, selectedPositionY: any) => {
+    const { addStep, rows, isOdd } = this.props;
+
+    const selectedPosition = rows[selectedPositionY][selectedPositionX];
+
+    const currentSymbol = this.changeSymbol(isOdd, selectedPosition);
+
+    if (currentSymbol === selectedPosition) return; 
+
+    addStep({
+      currentSymbol,
+      selectedPositionY,
+      selectedPositionX
+    });
+  };
+
   render() {
-    const { symbols, addStep, rows } = this.props;
+    const { symbols, rows, playerXSteps, playerYSteps } = this.props;
+
+    console.log(playerXSteps);
+    console.log(playerYSteps);
 
     return (
       <div className={`${rootCls}`}>
-        {Object.entries(rows).map((cell: React.ReactNode, indexY: number) => (
-          <Y key={`cellsY_${indexY}`}>
-            {Object.values(symbols).map((symbol: any, idndexX: number) => {
-              return (
-                <div
-                  key={`cellsX_${idndexX}`}
-                  onClick={addStep}
-                  className={`${rootCls}__cell`}
-                >
-                  {symbol}
-                </div>
-              );
-            })}
-          </Y>
-        ))}
+        {!_isEmpty(rows) &&
+          Object.entries(rows).map((cell: any, indexY: number) => {
+            return (
+              <Y key={`cellsY_${indexY}`}>
+                {!_isEmpty(symbols) &&
+                  Object.values(symbols).map((symbol: any, indexX: number) => {
+                    return (
+                      <div
+                        key={`cellsX_${indexX}`}
+                        onClick={() => this.handleClick(indexX, indexY)}
+                        className={`${rootCls}__cell`}
+                      >
+                        {rows[indexY] && rows[indexY][indexX]}
+                      </div>
+                    );
+                  })}
+              </Y>
+            );
+          })}
       </div>
     );
   }
 }
 
 function Y({ children, idx }: any) {
-  return (
-    <div className={`${rootCls}__row`} onClick={() => console.log(idx)}>
-      {children}
-    </div>
-  );
+  return <div className={`${rootCls}__row`}>{children}</div>;
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TicTacToeGame);

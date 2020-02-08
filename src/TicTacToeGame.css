@@ -4,7 +4,11 @@
 .ticTacToeGame__cell {
   width: 100px;
   height: 100px;
-  border: 1px solid #000;
+  border: 1px solid cornflowerblue;
+  font-size: 100px;
+  line-height: 1em;
+  text-align: center;
+  color: crimson;
 }
 
 .ticTacToeGame__row {
