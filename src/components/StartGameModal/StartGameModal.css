@@ -1,0 +1,24 @@
+.start-game-modal__description {
+  text-align: center;
+  font-size: 24px;
+  line-height: 2em;
+}
+
+.start-game-modal__input-wrap {
+  padding: 0 20px;
+}
+
+.start-game-modal__input {
+  width: 100%;
+}
+
+.start-game-modal__button-wrap {
+  padding: 20px;
+}
+
+.start-game-modal__button {
+  width: 100%;
+  height: 30px;
+  background: green;
+  color: white;
+}

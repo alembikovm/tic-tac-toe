@@ -18,7 +18,7 @@ interface Init {
   selectedPositionX: number,
   selectedPositionY: number,
   playerXSteps: PlayerCoordinates[],
-  playerYSteps: PlayerCoordinates[],
+  playerOSteps: PlayerCoordinates[],
   isOdd: boolean,
   gameLength: number
 }
@@ -32,22 +32,24 @@ const initialState: Init = {
   selectedPositionX: 0,
   selectedPositionY: 0,
   playerXSteps: [],
-  playerYSteps: [],
+  playerOSteps: [],
   isOdd: true,
-  gameLength: 5,
+  gameLength: 3,
 };
 
 function ticTacToeGame(state = initialState, action: any) {
   switch (action.type) {
     case ADD_STEP:
-      const { payload: { cellsXQuantity, cellsYQuantity, currentSymbol, selectedPositionX, selectedPositionY, isOdd = state.isOdd, gameLength = state.gameLength } } = action;
+      const { payload: { cellsXQuantity, cellsYQuantity, currentSymbol, selectedPositionX, selectedPositionY, isOdd = state.isOdd, gameLength = state.gameLength, } } = action;
       const x: any = { ...state.symbols };
       const y: any = {
         ...state.rows
       };
       let playerXSteps = [...state.playerXSteps];
-      let playerYSteps = [...state.playerYSteps];
+      let playerOSteps = [...state.playerOSteps];
       let xWin: boolean = false;
+      let oWin: boolean = false;
+
 
       // Initialise
       if (_isEmpty(state.symbols)) {
@@ -77,17 +79,19 @@ function ticTacToeGame(state = initialState, action: any) {
           if (isOdd) {
             playerXSteps = [...state.playerXSteps, { x: selectedPositionX, y: selectedPositionY }]
           } else {
-            playerYSteps = [...state.playerYSteps, { x: selectedPositionX, y: selectedPositionY }]
+            playerOSteps = [...state.playerOSteps, { x: selectedPositionX, y: selectedPositionY }]
           }
         }
       }
 
       //Game logic
       if (playerXSteps.length > gameLength) {
-        checkPlayerSteps(playerXSteps, gameLength);
+        xWin = checkPlayerSteps(playerXSteps, gameLength);
       }
 
-      // console.log(xWin);
+      if (playerOSteps.length > gameLength) {
+        oWin = checkPlayerSteps(playerOSteps, gameLength);
+      }
 
 
       return {
@@ -99,8 +103,11 @@ function ticTacToeGame(state = initialState, action: any) {
         selectedPositionX,
         selectedPositionY,
         playerXSteps,
-        playerYSteps,
-        isOdd: isOdd
+        playerOSteps,
+        isOdd: isOdd,
+        xWin,
+        oWin,
+        gameLength,
       };
 
     default:

@@ -1,11 +1,13 @@
 import React from "react";
 import _debounce from "lodash/debounce";
 import _isEmpty from "lodash/isEmpty";
-
-import { addStep } from "actions/ticTacToeGame";
 import { connect } from "react-redux";
 
+import StartGameModal from "components/StartGameModal";
+import { addStep } from "actions/ticTacToeGame";
+
 import "./TicTacToeGame.css";
+import WinnerModal from "components/WinnerModal";
 
 const rootCls = "ticTacToeGame";
 
@@ -92,13 +94,13 @@ class TicTacToeGame extends React.Component<any, any> {
   };
 
   handleClick = (selectedPositionX: any, selectedPositionY: any) => {
-    const { addStep, rows, isOdd } = this.props;
+    const { addStep, rows, isOdd, xWin, oWin } = this.props;
 
     const selectedPosition = rows[selectedPositionY][selectedPositionX];
 
     const currentSymbol = this.changeSymbol(isOdd, selectedPosition);
 
-    if (currentSymbol === selectedPosition) return; 
+    if (currentSymbol === selectedPosition || xWin || oWin) return;
 
     addStep({
       currentSymbol,
@@ -108,13 +110,13 @@ class TicTacToeGame extends React.Component<any, any> {
   };
 
   render() {
-    const { symbols, rows, playerXSteps, playerYSteps } = this.props;
+    const { symbols, rows, xWin, oWin } = this.props;
 
-    console.log(playerXSteps);
-    console.log(playerYSteps);
+    console.log(xWin);
+    console.log(oWin);
 
     return (
-      <div className={`${rootCls}`}>
+      <div className={rootCls}>
         {!_isEmpty(rows) &&
           Object.entries(rows).map((cell: any, indexY: number) => {
             return (
@@ -134,6 +136,9 @@ class TicTacToeGame extends React.Component<any, any> {
               </Y>
             );
           })}
+
+        <StartGameModal />
+        <WinnerModal isModalOpen={xWin || oWin} player={xWin ? "X" : "O"} />
       </div>
     );
   }
