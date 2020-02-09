@@ -3,16 +3,15 @@ import _isEmpty from "lodash/isEmpty";
 import { ADD_STEP } from "constants/ticTacToeGame";
 import { checkPlayerSteps } from "utils";
 
-
 interface PlayerCoordinates {
   x: number,
   y: number
 }
 
-interface Init {
-  symbols: any;
+interface InitialStateTypes {
+  symbols: any,
   rows: any,
-  currentSymbol: string;
+  currentSymbol: string,
   cellsXQuantity: number,
   cellsYQuantity: number,
   selectedPositionX: number,
@@ -20,10 +19,15 @@ interface Init {
   playerXSteps: PlayerCoordinates[],
   playerOSteps: PlayerCoordinates[],
   isOdd: boolean,
-  gameLength: number
+  gameLength: number,
 }
 
-const initialState: Init = {
+interface ActionTypes {
+  type: string,
+  payload: InitialStateTypes,
+}
+
+const initialState: InitialStateTypes = {
   cellsXQuantity: 0,
   cellsYQuantity: 0,
   symbols: {},
@@ -37,7 +41,7 @@ const initialState: Init = {
   gameLength: 3,
 };
 
-function ticTacToeGame(state = initialState, action: any) {
+function ticTacToeGame (state = initialState, action:ActionTypes) {
   switch (action.type) {
     case ADD_STEP:
       const { payload: { cellsXQuantity, cellsYQuantity, currentSymbol, selectedPositionX, selectedPositionY, isOdd = state.isOdd, gameLength = state.gameLength, } } = action;
@@ -115,4 +119,4 @@ function ticTacToeGame(state = initialState, action: any) {
   }
 }
 
-export { ticTacToeGame };
+export default ticTacToeGame ;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import _debounce from "lodash/debounce";
 import _isEmpty from "lodash/isEmpty";
 import { connect } from "react-redux";
@@ -15,32 +15,48 @@ const cellWidth = 100;
 
 const roundedNumber = (number: number) => Math.round(number);
 
-interface State {
+interface StateTypes {
   pageXOffset: number;
   pageYOffset: number;
 }
 
-interface MapState {
-  symbols?: any[];
+interface MapStateTypes {
+  ticTacToeGame: TicTacTypes;
+}
+
+interface TicTacTypes {
+  symbols: string[];
+  rows: React.ReactNode[];
   selectedPositionX: number;
   selectedPositionY: number;
   isOdd: boolean;
 }
 
-interface Props {
+interface MapDispatch {
   addStep: any;
-  cellWidth: SVGAnimatedNumberList;
-  symbols: any[];
 }
 
-const mapDispatchToProps = {
+interface PropsTypes {
+  cellWidth: number;
+  symbols: string[];
+  cellsXQuantity: number;
+  cellsYQuantity: number;
+  rows: React.ReactNode[];
+  selectedPositionX: number;
+  selectedPositionY: number;
+  isOdd: boolean;
+  xWin: boolean;
+  oWin: boolean;
+}
+
+const mapDispatchToProps: MapDispatch = {
   addStep
 };
 
-const mapStateToProps = (state: MapState) => state;
+const mapStateToProps = (state: MapStateTypes) => state.ticTacToeGame;
 
-class TicTacToeGame extends React.Component<any, any> {
-  state: Readonly<State> = {
+class TicTacToeGame extends React.Component<any, StateTypes> {
+  state: Readonly<StateTypes> = {
     pageXOffset: 0,
     pageYOffset: 0
   };
@@ -63,14 +79,14 @@ class TicTacToeGame extends React.Component<any, any> {
 
     const { cellsXQuantity, cellsYQuantity } = this.props;
 
-    if (window.pageXOffset > pageXOffset) {
-      this.setState((prevState: any) => ({
+    if (pageXOffset && window.pageXOffset > pageXOffset) {
+      this.setState((prevState: StateTypes) => ({
         pageXOffset: window.pageXOffset
       }));
 
       this.addStep({ cellsXQuantity: cellsXQuantity + 1, cellsYQuantity });
     } else {
-      this.setState((prevState: any) => ({
+      this.setState((prevState: StateTypes) => ({
         pageYOffset: window.pageYOffset
       }));
 
@@ -78,7 +94,7 @@ class TicTacToeGame extends React.Component<any, any> {
     }
   };
 
-  changeSymbol = (isOdd: boolean, currentSymbol: any) => {
+  changeSymbol = (isOdd: boolean, currentSymbol: string) => {
     if (currentSymbol === "") {
       this.addStep({ isOdd: !isOdd });
 
@@ -93,7 +109,7 @@ class TicTacToeGame extends React.Component<any, any> {
     addStep(coordinates);
   };
 
-  handleClick = (selectedPositionX: any, selectedPositionY: any) => {
+  handleClick = (selectedPositionX: number, selectedPositionY: number) => {
     const { addStep, rows, isOdd, xWin, oWin } = this.props;
 
     const selectedPosition = rows[selectedPositionY][selectedPositionX];
@@ -126,7 +142,7 @@ class TicTacToeGame extends React.Component<any, any> {
                         onClick={() => this.handleClick(indexX, indexY)}
                         className={`${rootCls}__cell`}
                       >
-                        {rows[indexY] && rows[indexY][indexX]}
+                        {rows && rows[indexY] && rows[indexY][indexX]}
                       </div>
                     );
                   })}
@@ -141,8 +157,12 @@ class TicTacToeGame extends React.Component<any, any> {
   }
 }
 
-function Y({ children, idx }: any) {
-  return <div className={`${rootCls}__row`}>{children}</div>;
+interface YProps {
+  children: React.ReactNode;
 }
+
+const Y: React.FunctionComponent<YProps> = ({ children }) => {
+  return <div className={`${rootCls}__row`}>{children}</div>;
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(TicTacToeGame);
