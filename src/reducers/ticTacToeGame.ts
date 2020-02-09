@@ -33,7 +33,7 @@ const initialState: Init = {
   selectedPositionY: 0,
   playerXSteps: [],
   playerOSteps: [],
-  isOdd: true,
+  isOdd: false,
   gameLength: 3,
 };
 

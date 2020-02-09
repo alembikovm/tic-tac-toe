@@ -82,7 +82,7 @@ class TicTacToeGame extends React.Component<any, any> {
     if (currentSymbol === "") {
       this.addStep({ isOdd: !isOdd });
 
-      return isOdd ? "X" : "O";
+      return isOdd ? "O" : "X";
     }
 
     return currentSymbol;
@@ -111,9 +111,6 @@ class TicTacToeGame extends React.Component<any, any> {
 
   render() {
     const { symbols, rows, xWin, oWin } = this.props;
-
-    console.log(xWin);
-    console.log(oWin);
 
     return (
       <div className={rootCls}>
